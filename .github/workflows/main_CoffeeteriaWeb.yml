@@ -14,24 +14,28 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-    - name: Log in to registry
-      uses: docker/login-action@v2
-      with:
-        registry: https://cafetria.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_a6c73633429f4d07916af5e7a7d8e9c9 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_7736d079ad814e50aed94bd853112583 }}
+      - name: Log in to registry
+        uses: docker/login-action@v2
+        with:
+          registry: cafetria.azurecr.io
+          username: ${{ secrets.AzureAppService_ContainerUsername }}
+          password: ${{ secrets.AzureAppService_ContainerPassword }}
 
-    - name: Build and push container image to registry
-      uses: docker/build-push-action@v3
-      with:
-        push: true
-        tags: cafetria.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_a6c73633429f4d07916af5e7a7d8e9c9 }}/coffee_docker:${{ github.sha }}
-        file: ./Dockerfile
+      - name: Convert username to lowercase
+        id: lowercase_username
+        run: echo "username=$(echo ${{ secrets.AzureAppService_ContainerUsername }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Build and push container image to registry
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: cafetria.azurecr.io/${{ env.username }}/coffee_docker:${{ github.sha }}
+          file: ./Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
@@ -41,11 +45,15 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-    - name: Deploy to Azure Web App
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'CoffeeteriaWeb'
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_aac27c4a02954ad6b2df5ecc0fcea9da }}
-        images: 'cafetria.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_a6c73633429f4d07916af5e7a7d8e9c9 }}/coffee_docker:${{ github.sha }}'
+      - name: Convert username to lowercase
+        id: lowercase_username
+        run: echo "username=$(echo ${{ secrets.AzureAppService_ContainerUsername }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'CoffeeteriaWeb'
+          slot-name: 'production'
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile }}
+          images: 'cafetria.azurecr.io/${{ env.username }}/coffee_docker:${{ github.sha }}'
