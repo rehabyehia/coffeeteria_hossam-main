@@ -23,8 +23,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: cafetria.azurecr.io
-          username: ${{ secrets.AzureAppService_ContainerUsername }}
-          password: ${{ secrets.AzureAppService_ContainerPassword }}
+          username: Cafetria
+          password: XnPb393M13orEufmuPWsGw2FzKXg/xe3MaF4V8dMG8+ACRBBePCr
       - name: Convert username to lowercase
         id: lowercase_username
         run: echo "username=$(echo ${{ secrets.AzureAppService_ContainerUsername }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
