@@ -35,7 +35,7 @@ jobs:
       with:
         push: true
         tags: cafetria.azurecr.io/${{env.username }}/coffee_docker:${{ github.sha }}
-        file: ./CoffeeTeria_project/Dockerfile
+        file: ./Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
