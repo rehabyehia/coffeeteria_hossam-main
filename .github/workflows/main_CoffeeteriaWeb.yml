@@ -34,7 +34,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: cafetria.azurecr.io/${{ env.username }}/${{ secrets.AzureAppService_ContainerUsername_e097412819324f358a8bd0d68909b967 }}/coffee_docker:${{ github.sha }}
+        tags: cafetria.azurecr.io/${{env.username }}/coffee_docker:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -56,4 +56,4 @@ jobs:
         app-name: 'CoffeeteriaWeb'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_bb32e47b86f24e62bac5701feed3ee89 }}
-        images: 'cafetria.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_e097412819324f358a8bd0d68909b967 }}/coffee_docker:${{ github.sha }}'
+        images: 'cafetria.azurecr.io/${{ env.username }}/coffee_docker:${{ github.sha }}'
